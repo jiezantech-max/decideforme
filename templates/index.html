@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DecideForMe · 决定外包机</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    background: #faf7f2; color: #23221f; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; padding: 32px 16px;
+  }
+  .wrap { width: 100%; max-width: 620px; }
+  h1 { font-size: 2rem; margin-bottom: 4px; }
+  .tagline { color: #6f6555; margin-bottom: 24px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip {
+    border: 2px solid #23221f; background: #fff; border-radius: 999px;
+    padding: 8px 16px; cursor: pointer; font-size: 0.95rem;
+  }
+  .chip.active { background: #23221f; color: #fff; }
+  textarea, input[type=text] {
+    width: 100%; border: 2px solid #23221f; border-radius: 12px;
+    padding: 12px; font-size: 1rem; background: #fff; margin-bottom: 12px;
+  }
+  .decide-btn {
+    width: 100%; background: #a13f04; color: #fff; border: none;
+    border-radius: 12px; padding: 16px; font-size: 1.2rem; font-weight: 700;
+    cursor: pointer; margin-bottom: 20px;
+  }
+  .decide-btn:hover { background: #7a3303; }
+  .decide-btn:disabled { opacity: 0.6; cursor: wait; }
+  .result { display: none; border: 3px solid #23221f; border-radius: 16px;
+    background: #fff; padding: 24px; margin-bottom: 20px; position: relative;
+    box-shadow: 6px 6px 0 #23221f; }
+  .result.show { display: block; animation: pop 0.3s ease; }
+  @keyframes pop { from { transform: scale(0.96); } to { transform: scale(1); } }
+  .stamp {
+    position: absolute; top: -16px; right: 16px; background: #2e7d32; color: #fff;
+    padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.8rem;
+    transform: rotate(8deg);
+  }
+  .decision { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+  .reason { color: #4a4438; margin-bottom: 12px; }
+  .confidence { font-size: 0.9rem; color: #6f6555; margin-bottom: 12px; }
+  .considered { font-size: 0.85rem; color: #6f6555; }
+  .defend-btn { background: none; border: 2px dashed #a13f04; color: #a13f04;
+    border-radius: 10px; padding: 8px 16px; cursor: pointer; margin-top: 12px; }
+  .defense { margin-top: 12px; padding: 12px; background: #fff3e6;
+    border-radius: 10px; display: none; }
+  .counter {
+    position: fixed; bottom: 16px; right: 16px; background: #23221f; color: #fff;
+    padding: 10px 16px; border-radius: 999px; font-size: 0.9rem;
+  }
+  .engine { font-size: 0.75rem; color: #999; margin-top: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🦥 DecideForMe · 决定外包机</h1>
+  <p class="tagline">Outsource your small decisions. Keep your brain for big ones.</p>
+
+  <div class="chips" id="chips">
+    <button class="chip active" data-cat="food">🍜 What to eat</button>
+    <button class="chip" data-cat="watch">🎬 What to watch</button>
+    <button class="chip" data-cat="go">🚶 Go or not</button>
+    <button class="chip" data-cat="buy">🛒 Buy or not</button>
+    <button class="chip" data-cat="custom">✏️ Custom</button>
+  </div>
+
+  <textarea id="dilemma" rows="3" placeholder="What's the dilemma? e.g. What should I have for lunch?"></textarea>
+  <input type="text" id="options" placeholder="Options (comma separated, optional — leave blank and I'll invent them)">
+
+  <button class="decide-btn" id="decideBtn" onclick="decide()">DECIDE FOR ME</button>
+
+  <div class="result" id="result">
+    <div class="stamp">OUTSOURCED ✓</div>
+    <div class="decision" id="decision"></div>
+    <div class="reason" id="reason"></div>
+    <div class="confidence" id="confidence"></div>
+    <div class="considered" id="considered"></div>
+    <button class="defend-btn" onclick="defend()">🤔 Disagree? Let it defend itself</button>
+    <div class="defense" id="defense"></div>
+  </div>
+
+  <p class="engine" id="engine"></p>
+</div>
+
+<div class="counter" id="counter">Decisions outsourced: 0</div>
+
+<script>
+let category = 'food';
+let lastDecision = null;
+
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    category = c.dataset.cat;
+  });
+});
+
+function today() { return new Date().toISOString().slice(0, 10); }
+function getCount() {
+  try {
+    const s = JSON.parse(localStorage.getItem('dfm_counter') || '{}');
+    return s.date === today() ? s.count : 0;
+  } catch (e) { return 0; }
+}
+function bumpCount() {
+  const n = getCount() + 1;
+  localStorage.setItem('dfm_counter', JSON.stringify({date: today(), count: n}));
+  renderCounter();
+}
+function renderCounter() {
+  document.getElementById('counter').textContent = 'Decisions outsourced today: ' + getCount();
+}
+renderCounter();
+
+async function decide() {
+  const dilemma = document.getElementById('dilemma').value.trim();
+  const options = document.getElementById('options').value.trim();
+  if (!dilemma) { alert('Tell me the dilemma first.'); return; }
+  const btn = document.getElementById('decideBtn');
+  btn.disabled = true; btn.textContent = 'Outsourcing…';
+  document.getElementById('defense').style.display = 'none';
+  try {
+    const r = await fetch('/api/decide', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({dilemma, options, category})
+    });
+    const d = await r.json();
+    if (d.error) { alert(d.error); return; }
+    lastDecision = d;
+    document.getElementById('decision').textContent = d.decision;
+    document.getElementById('reason').textContent = d.reason;
+    document.getElementById('confidence').textContent = 'Confidence: ' + d.confidence + '% (suspiciously high, as always)';
+    document.getElementById('considered').textContent =
+      (d.options_considered || []).length ? 'Considered: ' + d.options_considered.join(' · ') : '';
+    document.getElementById('engine').textContent = d.engine || '';
+    document.getElementById('result').classList.add('show');
+    bumpCount();
+  } finally {
+    btn.disabled = false; btn.textContent = 'DECIDE FOR ME';
+  }
+}
+
+async function defend() {
+  if (!lastDecision) return;
+  const r = await fetch('/api/defend', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({decision: lastDecision.decision, reason: lastDecision.reason})
+  });
+  const d = await r.json();
+  const el = document.getElementById('defense');
+  el.textContent = d.defense || '';
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
