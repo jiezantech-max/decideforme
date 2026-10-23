@@ -45,6 +45,21 @@ Live demo (once the tunnel picks it up): https://decide.motinextai.com
 — the Decision Outsource Machine on my own domain via Cloudflare Tunnel.
 Prefer local? `python app.py` → http://localhost:5001 (mock mode needs no API key).
 
+<!--
+PLAN B（decide 发帖时还没通的兜底版）：把上面 Demo 节整段换成下面这段，注释删掉。
+
+## Demo
+
+No public demo yet — try it locally in 60 seconds, no API key needed:
+
+git clone https://github.com/jiezantech-max/decideforme && cd decideforme
+pip install -r requirements.txt
+python app.py   → http://localhost:5001
+
+Mock mode ships with curated option pools and canned witty reasons, so the
+full decide → defend flow works out of the box.
+-->
+
 ## Code
 
 https://github.com/jiezantech-max/decideforme — public repo, MIT license.
