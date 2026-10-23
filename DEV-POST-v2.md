@@ -41,12 +41,13 @@ regret has been noted and automatically discarded.")
 
 ## Demo
 
-[待填：你的公网 demo 链接（.tech 域名领了并部署好再填），或贴一个屏幕录制视频]
-<!-- 没有公网链接就删掉 Demo 章节，或者保留但写"本地运行：python app.py → http://localhost:5001" -->
+Live demo (once the tunnel picks it up): https://decide.motinextai.com
+— the Decision Outsource Machine on my own domain via Cloudflare Tunnel.
+Prefer local? `python app.py` → http://localhost:5001 (mock mode needs no API key).
 
 ## Code
 
-[待填：你的公开代码仓库链接（投稿要求项目代码公开）]
+https://github.com/jiezantech-max/decideforme — public repo, MIT license.
 
 ## How I Built It
 
