@@ -1,6 +1,6 @@
 # DecideForMe · 决定外包机
 
-Outsource your small decisions. Keep your brain for big ones.
+> 把生活里的小纠结外包给 AI，大脑留给大事。Outsource your small decisions. Keep your brain for big ones.
 
 Built for **DEV Hacktoberfest 2026 — Week 3: Slow and Steady**
 (challenge prompt: build something with open-source AI at its core).
