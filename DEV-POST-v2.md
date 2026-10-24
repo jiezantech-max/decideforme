@@ -81,6 +81,20 @@ vendor's pricing or uptime. Mock mode even works fully offline. Open
 innovation is what makes "outsourcing decisions" a toy anyone can run,
 not a service someone has to rent.
 
+## My Agent Session
+
+I didn't record a DevRelay session for this build — but the whole thing happened in the open. The repo's commit history is the session log: [github.com/jiezantech-max/decideforme/commits](https://github.com/jiezantech-max/decideforme/commits).
+
+Five commits, four days, one lazy arc:
+
+1. **Scaffold** — Flask app, the Decider/Defender prompts, mock mode, the OUTSOURCED stamp
+2. **Docs** — bilingual README, deploy guide, first submission draft
+3. **Submission draft v2** — rewritten against the official template
+4. **Live demo** — `decide.motinextai.com` via Cloudflare Tunnel
+5. **Final polish** — post-ready
+
+The laziest decision engine, built the lazy way: mock mode first (zero API key), demo link last, no yak-shaving in between.
+
 ## The Lazy Payoff
 
 Before: 5 minutes of fridge-staring, 20 tabs of "best ramen near me"
